@@ -350,26 +350,7 @@ def make_request_with_cache(cache_key, cache_value):
         return CACHE_DICT[cache_key]
 
 def actor_profile(keyword):
-    # ''' Scrapes USDA ERS county-level datasets webpage and creates a dictionary for each dataset and its corresponding URL.
 
-    # PARAMETERS
-    # ----------
-    # none
-
-    # RETURNS
-    # -------
-    # dict:
-    #     Dictionary of 4 county-level data sets available from the USDA ERS and their respective URLs.
-    # '''
-
-    # url = f"https://en.wikipedia.org/wiki/{keyword}"
-    # response = requests.get(url)
-    # soup = BeautifulSoup(response.text, "html.parser")
-
-    # make_request_with_cache(url, soup.prettify())
-    
-    # section = soup.find("table", {"class":"infobox biography vcard"})
-    # return section
 
 
     person_url = []
