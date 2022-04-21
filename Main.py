@@ -10,6 +10,7 @@ import csv
 import sqlite3
 import time
 import pprint
+import re
 
 CACHE_FILENAME = "movie_cache.json"
 CACHE_DICT = {}
@@ -349,26 +350,44 @@ def make_request_with_cache(cache_key, cache_value):
         return CACHE_DICT[cache_key]
 
 def actor_profile(keyword):
-    ''' Scrapes USDA ERS county-level datasets webpage and creates a dictionary for each dataset and its corresponding URL.
+    # ''' Scrapes USDA ERS county-level datasets webpage and creates a dictionary for each dataset and its corresponding URL.
 
-    PARAMETERS
-    ----------
-    none
+    # PARAMETERS
+    # ----------
+    # none
 
-    RETURNS
-    -------
-    dict:
-        Dictionary of 4 county-level data sets available from the USDA ERS and their respective URLs.
-    '''
+    # RETURNS
+    # -------
+    # dict:
+    #     Dictionary of 4 county-level data sets available from the USDA ERS and their respective URLs.
+    # '''
 
-    url = f"https://en.wikipedia.org/wiki/{keyword}"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, "html.parser")
+    # url = f"https://en.wikipedia.org/wiki/{keyword}"
+    # response = requests.get(url)
+    # soup = BeautifulSoup(response.text, "html.parser")
 
-    make_request_with_cache(url, soup.prettify())
+    # make_request_with_cache(url, soup.prettify())
     
-    section = soup.find("table", {"class":"infobox biography vcard"})
-    return section
+    # section = soup.find("table", {"class":"infobox biography vcard"})
+    # return section
+
+
+    person_url = []
+    urlpage =  'https://en.wikipedia.org/wiki/' + keyword
+    # query the website and return the html to the variable 'page'
+    page = requests.get(urlpage).text
+    # parse the html using beautiful soup and store in variable 'soup'
+    soup = BeautifulSoup(page, 'html.parser')
+    for raw_img in soup.find_all('img'):
+        link = raw_img.get('src')
+        # The first image on the page with the URL strucutre below is usually 
+        # the image inside the infobox. We exlcude any .svg images, as they are 
+        # vector graphics common to all Wikipedia pages
+        if re.search('wikipedia/.*/thumb/', link) and not re.search('.svg', link):
+            person_url = [keyword, link]
+            # Once the first image has been found, we break out of the loop and search the next page
+            break
+    return person_url
 
 if __name__ == "__main__":
     CACHE_DICT = open_cache()
@@ -389,16 +408,20 @@ if __name__ == "__main__":
 
     # pprint.pprint(foo())
 
-    # x = actor_profile('The_Shawshank_Redemption')
-    # print(x)
+    x = actor_profile('Timothée Chalamet')
+    print(x)
 
-    url = "https://www.imdb.com/title/tt0111161/"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, "html.parser")
+    # url = "https://www.imdb.com/title/tt0111161/"
+    # response = requests.get(url)
+    # soup = BeautifulSoup(response.text, "html.parser")
 
-    make_request_with_cache(url, soup.prettify())
+    # make_request_with_cache(url, soup.prettify())
     
-    section = soup.find("li", {"class":"ipc-metadata-list__item sc-3c7ce701-2 eYXppQ"})
-    # indiv = section.find("ul")
-    print(section.text.strip())
+    # section = soup.find("li", {"class":"ipc-metadata-list__item sc-3c7ce701-2 eYXppQ"})
+    # # indiv = section.find("ul")
+    # print(section.text.strip())
+
+
+    # x = actor_profile("timothee chalamet")
+    # print(x)
 
