@@ -1,0 +1,326 @@
+
+<head>
+    <style>
+        body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background: rgb(2,0,36);
+background: radial-gradient(circle, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 70%, rgba(0,212,255,1) 100%);
+  }
+ 
+  .main_card {
+    color: #fff;
+    width: 760px;
+    height: 390px;
+    margin: 50px auto;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    max-width: 770px;
+    background: #00C9FF; 
+    background: -webkit-linear-gradient(to right, #92FE9D, #00C9FF);
+    background: -webkit-gradient(linear, left top, right top, from(#92FE9D), to(#00C9FF));
+    background: -webkit-linear-gradient(left, #92FE9D, #00C9FF);
+    background: -o-linear-gradient(left, #92FE9D, #00C9FF);
+    background: linear-gradient(to right, #92FE9D, #00C9FF); 
+    -webkit-box-shadow: 0 0 40px rgba(0,0,0,0.3); 
+            box-shadow: 0 0 40px rgba(0,0,0,0.3);
+  }
+  
+  .card_left {
+    width: 90%;
+  }
+  
+  .card_datails {
+    width: 90%;
+    padding: 30px;
+    margin-top: -25px;
+  }
+  .card_datails  h1 {
+    font-size: 30px;
+  }
+  .card_right img {
+    height: 390px;
+    border-radius: 2px;
+  }
+  .card_right {
+    border-radius: 2px;
+  }
+  
+  .card_cat {
+    width: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+  }
+  
+  .PG, .year, .genre, .time {
+    color: fff;
+    padding: 10px;
+    font-weight: bold;
+    border-radius: 15px;
+  }
+  
+  .PG {
+    background: #92FE9D;
+    -webkit-box-shadow: 0 0 50px rgba(0,0,0,0.1);
+            box-shadow: 0 0 50px rgba(0,0,0,0.1);
+    transition: 300ms ease-in-out;
+  }
+  
+  .disc {
+    font-weight: 100;
+    line-height: 27px;
+  }
+  a {
+    color: darkcyan;
+    display: block;
+    text-decoration: none;
+  }
+  .social-btn {
+    margin-left: -10px;
+  }
+  button {
+    color: #fff;
+    border: none;
+    padding: 20px;
+    outline: none;
+    font-size: 12px;
+    margin-top: 30px;
+    margin-left: 10px;
+    background: #92FE9D;
+    border-radius: 12px;
+    -webkit-box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    -webkit-transition: 300ms ease-in-out;
+    -o-transition: 200ms ease-in-out;
+    transition: 200ms ease-in-out;
+  }
+
+  button:hover {
+    -webkit-transform: scale(1.1);
+        -ms-transform: scale(1.1);
+            transform: scale(1.1);
+  }
+  .play_btn {
+    height: 100%;
+    margin: -394px auto;
+    position: relative;
+    text-align: center;
+    background: rgba(0, 244, 170,0.4);
+    box-shadow: 0 0 50px rgba(0,0,0,0.2);
+  }
+  .fa-play-circle {
+    color: #255;
+    font-size: 160px;
+    margin-top: 110px;
+    -webkit-animation: bounce 1.0s -0.4s infinite;
+            animation: bounce 1.0s -0.4s infinite;
+  }
+
+  .fa-play-circle:hover {
+    color: aqua;
+    animation: bounce 0.4s infinite;
+  }
+  @-webkit-keyframes bounce {
+    8% {
+      transform: scale(0.3);
+      -webkit-transform: scale(0.8);
+      opacity: 1;
+    }
+    10% {
+      transform: scale(1.8);
+      -webkit-transform: (scale2);
+      opacity: 0;
+      }
+  }
+  
+  @keyframes bounce {
+    8% {
+      transform: scale(0.3);
+      -webkit-transform: scale(0.8);
+      opacity: 1;
+    }
+    20% {
+      transform: scale(1.8);
+      -webkit-transform: (scale2);
+      opacity: 0;
+      }
+  }
+  /*  FOLLOW*/
+  .Follow {   background:url("https://pbs.twimg.com/profile_images/959092900708544512/v4Db9QRv_bigger.jpg")no-repeat center / contain;
+    width: 50px;
+    height: 50px;
+    bottom: 9px;
+    right: 20px;
+    display:block;
+    position:fixed;
+    border-radius:50%;
+    z-index:999;
+    animation:  rotation 10s infinite linear;
+    }
+  
+  @keyframes rotation {
+      from {
+          -webkit-transform: rotate(0deg);
+      }
+      to {
+          -webkit-transform: rotate(359deg);
+      }
+  }
+h1{
+  text-align: center;
+  color:white
+}
+
+
+.our-team {
+  padding: 30px 0 40px;
+  margin-bottom: 30px;
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+  color:white
+}
+
+.our-team .picture {
+  display: inline-block;
+  height: 130px;
+  width: 130px;
+  margin-bottom: 50px;
+  z-index: 1;
+  position: relative;
+}
+
+.our-team .picture::before {
+  content: "";
+  width: 100%;
+  height: 0;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 135%;
+  right: 0;
+  left: 0;
+  opacity: 0.9;
+  transform: scale(3);
+  transition: all 0.3s linear 0s;
+}
+
+.our-team .picture img {
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+  transform: scale(1);
+  transition: all 0.9s ease 0s;
+}
+
+
+.our-team .title {
+  display: block;
+  font-size: 15px;
+  color:white;
+  text-transform: capitalize;
+}
+.button-29 {
+  align-items: center;
+  justify-content: center;
+  appearance: none;
+  background-image: radial-gradient(100% 100% at 100% 0, #5adaff 0, #5468ff 100%);
+  border: 0;
+  border-radius: 6px;
+  box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: "JetBrains Mono",monospace;
+  height: 48px;
+  line-height: 1;
+  list-style: none;
+  overflow: hidden;
+  padding-left: 16px;
+  padding-right: 16px;
+  position: relative;
+  text-align: left;
+  text-decoration: none;
+  transition: box-shadow .15s,transform .15s;
+  user-select: none;
+  -webkit-user-select: none;
+  white-space: nowrap;
+  will-change: box-shadow,transform;
+  font-size: 18px;
+  top: 50%;
+        left: 50%;
+        margin-right: -50%;
+        transform: translate(-50%, -50%);
+        justify-content: center
+}
+
+
+
+  
+    </style>
+</head>
+{%for x in t.keys()%}
+    <div class="wrapper">
+    <div class="main_card">
+        <div class="card_left">
+        <div class="card_datails">
+
+            <h1>{{x}}</h1>
+            <div class="card_cat">
+            <p class="PG">PG - 13</p>
+            <p class="year">{{t[x]['Year']}}</p>
+            <p class="genre">{{t[x]['genre']}} </p>
+            <p class="time">2h 28m</p>
+            </div>
+            <p class="disc">{{t[x]['Desc'] | truncate(150) | safe}}</p>
+            <a href="https://www.imdb.com/title/{{t[x]['imdb']}}/" target="_blank">Read More</a>
+        <div class="social-btn">
+            <!-- WATCH TRAILER-->
+            <button>
+            <i class="fas fa-play"></i> {{t[x]['Pop']}}
+            </button>
+            <!-- GET-->
+            <button>
+            <i class="fas fa-download"></i> DOWNLOAD
+            </button>
+            <!--USERS RATINGS-->
+            <button>
+            <i class="fas fa-thumbs-up"></i> {{t[x]['rating']}}
+            </button>
+        </div>
+        </div>
+        </div>
+        <div class="card_right">
+        <div class="img_container">
+            <img src="{{t[x]['poster']}}" alt="">
+            </div>
+        </div>
+        </div>
+    </div>
+    <h1> Actors </h1>
+    {%for i in range(len)%}
+    <div class="container">
+      <div class="row">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+          <div class="our-team">
+            <div class="picture">
+              <img class="img-fluid" src="https://{{t[x]['actor_picture'][i]}}">
+            </div>
+            <div class="team-content">
+              <h3 class="name">{{t[x]['actor'][i]}}</h3>
+            </div>
+            
+          </div>
+        </div>
+      {%endfor%}
+{%endfor%}
+
+<form action="/index" method="POST">
+  <button class="button-29" >Home Page</button>
+  </form>

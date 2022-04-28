@@ -1,22 +1,164 @@
 from bs4 import BeautifulSoup
+from django.http import response
 from openpyxl import load_workbook
-import plotly.graph_objs as go
-import plotly.figure_factory as ff
 from py import builtin
 import requests
 import json
-import webbrowser
 import csv
 import sqlite3
-import time
-import pprint
 import re
+from flask import Flask,render_template,request
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
 
 CACHE_FILENAME = "movie_cache.json"
 CACHE_DICT = {}
 DB_NAME = "movie.sqlite"
 
 
+
+tree = {}
+api_key = "9c601f958ba38d1f21e27b94cf35dd38"
+data = pd.read_csv("/Users/arjunanandapadmanabhan/Desktop/Projects/507_Final_Project/Data/tv.csv")
+
+tv_dict = {}
+tv_id = data['id']
+tv_title = data['name']
+for name, item in zip(tv_title, tv_id):
+    tv_dict[name] = item
+
+app = Flask(__name__)
+ 
+@app.route('/')
+def index():
+    
+    return render_template('index.html')
+
+main_dict = {}
+
+@app.route('/first_option', methods = ['GET'])
+def first_opt():
+    if request.method == 'GET':
+        return render_template('First_option.html')    
+        # if request.method == 'POST':
+        # temp = request.form.get("xxx")
+        # print(temp)
+        
+
+@app.route('/language', methods = ['POST', 'GET'])
+def lang():
+    global main_dict
+    if request.method == 'GET':
+        return f"The URL /data is accessed directly. Try going to '/form' to submit form"
+    if request.method == 'POST':
+        temp = request.form.get("firstop")
+        main_dict['firstop'] = temp
+        return render_template('language.html')
+
+@app.route('/genre', methods = ['POST', 'GET'])
+def genre():
+    global main_dict
+    if request.method == 'GET':
+        return f"The URL /data is accessed directly. Try going to '/form' to submit form"
+    if request.method == 'POST':
+        temp = request.form.get("language")
+        main_dict['language'] = temp
+        if main_dict['firstop'] == "Movie":
+            return render_template('genremovie.html')
+        else:
+            return render_template('genretv.html')
+
+@app.route('/year', methods = ['POST', 'GET'])
+def year():
+    global main_dict
+    if request.method == 'GET':
+        return f"The URL /data is accessed directly. Try going to '/form' to submit form"
+    if request.method == 'POST':
+        temp = request.form.get("genre")
+        main_dict['genre'] = temp
+        return render_template('year.html')
+
+@app.route('/title', methods = ['POST', 'GET'])
+def final():
+    global main_dict, tree
+    if request.method == 'GET':
+        return f"The URL /data is accessed directly. Try going to '/form' to submit form"
+    if request.method == 'POST':
+        temp = request.form.get("year")
+        main_dict['year'] = temp
+        d = {}
+        t = []
+        if temp == "a":
+            for i in range(1990, 2001):
+                temp = tree[main_dict['firstop']][main_dict['language']][main_dict['genre']][str(i)]
+                for x in temp: 
+                    t.append(x)
+        elif temp == "b":
+            for i in range(2001, 2006):
+                temp = tree[main_dict['firstop']][main_dict['language']][main_dict['genre']][str(i)]
+                for x in temp: 
+                    t.append(x)
+        elif temp == "c":
+            for i in range(2006, 2011):
+                temp = tree[main_dict['firstop']][main_dict['language']][main_dict['genre']][str(i)]
+                for x in temp: 
+                    t.append(x)
+        elif temp == "d":
+            for i in range(2011, 2016):
+                temp = tree[main_dict['firstop']][main_dict['language']][main_dict['genre']][str(i)]
+                for x in temp: 
+                    t.append(x)
+        elif temp == "e":
+            for i in range(2016, 2021):
+                temp = tree[main_dict['firstop']][main_dict['language']][main_dict['genre']][str(i)]
+                for x in temp: 
+                    t.append(x)
+        elif temp == "f":
+            for i in range(2021, 2023):
+                temp = tree[main_dict['firstop']][main_dict['language']][main_dict['genre']][str(i)]
+                for x in temp: 
+                    t.append(x)
+        if t:
+            return render_template('title.html', len = len(t), t = t)
+        else:
+            return render_template('error.html')
+
+@app.route('/title2', methods = ['POST', 'GET'])
+def final2():
+    if request.method == 'GET':
+        return f"The URL /data is accessed directly. Try going to '/form' to submit form"
+    
+    if request.method == 'POST':
+        temp = request.form.get("title")
+        d= {}
+        if main_dict['firstop'] == 'Movie':
+                res = access_movie_sql_database(temp)[0]
+                try: 
+                    poster = requests.get(f"https://api.themoviedb.org/3/movie/{res[-1]}?api_key={api_key}").json()['poster_path']
+                    poster_url = "https://image.tmdb.org/t/p/w500" + poster
+                except:
+                    poster= "https://imdb-api.com/posters/original/edv5CZvWj09upOsy2Y6IwDhK8bt.jpg"
+                imdb_rating = movie_info(res[-1])['imbd_rating']
+                actors = movie_info(res[-1])['actor_list']
+                actor_picture = [actor_profile(item) for item in actors]
+                d[temp] = {'Desc': res[0], 'Pop': res[1], 'Year': res[2][:4], 'imdb': res[3], 'poster':poster_url, 'rating':imdb_rating, 'genre': main_dict['genre'], 'actor':actors, 'actor_picture':actor_picture}
+        else:
+                res = access_movie_sql_database(temp, 'TV')[0]
+                item = tv_dict[temp]
+                response = requests.get(f"http://api.themoviedb.org/3/tv/{item}?api_key={api_key}&append_to_response=external_ids").json()['external_ids']['imdb_id']
+                poster = requests.get(f"https://api.themoviedb.org/3/tv/{item}/season/1/images?api_key={api_key}").json()['posters'][0]["file_path"]
+                poster_url = "https://image.tmdb.org/t/p/w500" + poster
+                imdb_rating = movie_info(response)['imbd_rating']
+                actors = movie_info(response)['actor_list']
+                actor_picture = [actor_profile(item) for item in actors]
+                d[temp] = {'Desc': res[0], 'Pop': res[1], 'Year': res[2][:4], 'imdb': response, 'poster': poster_url, 'genre':main_dict['genre'], 'rating': imdb_rating, 'actor':actors, 'actor_picture':actor_picture}
+        return render_template('title2.html', len = len(actor_picture),t = d)
+
+@app.route('/index', methods = ['POST', 'GET'])
+def error():
+    if request.method == 'POST':
+        return render_template('index.html')
 
 def create_database():
     ''' Creates a SQL database with 4 tables: "Movie", "TV" and two "Genre" tables each for Movie and TV. 
@@ -147,15 +289,15 @@ def populate_database():
         csv_header = csv.reader(csvfile)
         for h in csv_header:
             data_tv.append(h)
-        data_header_tv.extend(data[0])
-        data_rows_tv.extend(data[1:])
+        data_header_tv.extend(data_tv[0])
+        data_rows_tv.extend(data_tv[1:])
 
     insert_tv_sql = '''
         INSERT INTO TV
         VALUES (NULL, ?, ? , ?, ?, ?, ?, ?, ?)
     '''
 
-    for dr in data_rows:
+    for dr in data_rows_tv:
         cur.execute(insert_tv_sql, [
             dr[3],
             dr[4],
@@ -211,39 +353,100 @@ def populate_database():
     conn.close()
 
 def movie_info(imdb_id):
+    ''' The function takes in IMDB ID as input and retrives the movie information including actors, directors and IMDB rating from OMDB API. 
+    
+    PARAMETERS
+    ----------
+    imdb_id: String
+
+    RETURNS
+    -------
+    info: A dictionary with the cast and crew information and IMDB rating. 
+    '''
     url = "http://www.omdbapi.com/?"
     API_key = "23fd4044"
     movie_infomation= requests.get(f"{url}apikey={API_key}&i={imdb_id}").json()
     info = {'director':[movie_infomation['Director']], 'actor_list':movie_infomation['Actors'].split(', '), 'poster': movie_infomation['Poster'], 'imbd_rating': movie_infomation['imdbRating'] }
     return info
 
-def access_movie_sql_database(title):
+def access_movie_sql_database(title, option=None):
+    ''' The function access the movie database and retrieves information of a particular movie from the database based on "Movie/TV show title".
+    
+    PARAMETERS
+    ----------
+    title: String
+    option: It can be "TV" or None
+
+    RETURNS
+    -------
+    result: A dictionary containg overview, popularity score and release date of the movie (retrived from the database)
+    '''
     conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
-    query = f'''
-        SELECT *
-        FROM Movie
-        WHERE Title = "{title}"
-    '''
+    if option:
+        query = f'''
+            SELECT Overview, Popularity, Release_date 
+            FROM TV
+            WHERE Title = "{title}"
+        '''
+    else:
+        query = f'''
+            SELECT Overview, Popularity, Release_date, IMDB
+            FROM MOVIE
+            WHERE Title = "{title}"
+        '''
     result = cur.execute(query).fetchall()
     conn.close()
     return result
 
 
 def access_genre_sql_database(genre, f):
+    ''' The function access the genre database and retrieves genre_id from the database based on "genre_name".
+    
+    PARAMETERS
+    ----------
+    genre: String, genre name
+    f: string (Movie/TV)
+
+    RETURNS
+    -------
+    result: genre id
+    '''
     conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
+    if f=='Movie':
+        s = ""
+    else:
+        s = 'tv'
     query = f'''
         SELECT Genre_ID
-        FROM {f}
-        WHERE  Genre_Name = " {genre}"
+        FROM Genre{s}
+        WHERE Genre_Name = " {genre}"
     '''
 
     result = cur.execute(query).fetchall()
     conn.close()
-    return result[0][0]
+
+    if result == []:
+        return []
+    else:
+        return result[0][0]
+
 
 def db_to_dict(f, l, g, y):
+    ''' The function access the movie database and retrieves information the database based on multiple parameters and returns a dictionary. 
+    
+    PARAMETERS
+    ----------
+    f: String, Movie/TV
+    l: string (language)
+    g: string(genre)
+    y: int(year)
+
+    RETURNS
+    -------
+    result: a dictonary containing the movie information based on the parameters. 
+    '''
     conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
     query = f'''
@@ -258,21 +461,36 @@ def db_to_dict(f, l, g, y):
 
     return result
 
-first_op = ['TV Show', 'Movie']
-genre_op = ['Thriller', 'Horror']
-language_op = ['fr', 'es']
-year_op = ['2020', '2019']
-tree = {}
+def acccess_genre_name(genre_id, option=None):
+    conn = sqlite3.connect(DB_NAME)
+    cur = conn.cursor()
+    if option:
+        query = f'''
+            SELECT Genre_Name
+            FROM Genretv
+            WHERE Genre_ID = "{genre_id}"
+        '''
+    result = cur.execute(query).fetchall()
+    conn.close()
+
+    return result
+
+first_op = ['TV', 'Movie']
+genre_op = ['Comedy', 'Drama', 'Romance', 'Crime', 'Animation', 'Family', 'Mystery', 'Fantasy', 'Thriller', 'Action', 'Adventure', 'History', 'War', 'Western', 'Science Fiction', 'Horror', 'TV Movie'\
+    'Music', 'Reality', 'Sci-Fi & Fantasy', 'Action & Adventure', 'Documentary', 'War & Politics', 'Kids', 'Soap', 'Talk', 'News', 'Musical']
+language_op = ['fr', 'es', 'hi', 'ja', 'ko', 'en']
+year_op = [str(x) for x in range(1990, 2023)]
+
+
 
 def create_tree():
+    
     for f in first_op:
         tree[f] = {}
-
         for l in language_op:
             tree[f][l] = {}
             for g in genre_op:
-                x = 'Genre' if f == 'Movie' else 'Genretv'
-                g_val = access_genre_sql_database(g, x) 
+                g_val = access_genre_sql_database(g,f)
                 tree[f][l][g] = {}
                 for y in year_op:
                     temp = db_to_dict(f, l, g_val, y)
@@ -350,59 +568,39 @@ def make_request_with_cache(cache_key, cache_value):
         return CACHE_DICT[cache_key]
 
 def actor_profile(keyword):
+    ''' The function scrapes the wikipedia webpage for actor picture based on the keyword parameter and returns the picture URL.  
+    
+    PARAMETERS
+    ----------
+    keyword: String (actor name)
 
+    RETURNS
+    -------
+    person_url: a url for the actors picture. 
+    '''
 
 
     person_url = []
     urlpage =  'https://en.wikipedia.org/wiki/' + keyword
-    # query the website and return the html to the variable 'page'
     page = requests.get(urlpage).text
-    # parse the html using beautiful soup and store in variable 'soup'
     soup = BeautifulSoup(page, 'html.parser')
+    make_request_with_cache(urlpage, soup.prettify())
+    
     for raw_img in soup.find_all('img'):
         link = raw_img.get('src')
-        # The first image on the page with the URL strucutre below is usually 
-        # the image inside the infobox. We exlcude any .svg images, as they are 
-        # vector graphics common to all Wikipedia pages
         if re.search('wikipedia/.*/thumb/', link) and not re.search('.svg', link):
-            person_url = [keyword, link]
-            # Once the first image has been found, we break out of the loop and search the next page
+            person_url = [link[2:]]
             break
-    return person_url
+    return person_url[0]
 
 if __name__ == "__main__":
     CACHE_DICT = open_cache()
     create_database()
     populate_database()
-
-    # conn = sqlite3.connect(DB_NAME)
-    # cur = conn.cursor()
-    # query = f'''
-    #     SELECT Title
-    #     FROM Movie
-    #     WHERE Release_date LIKE '2011%'
-    # '''
-    # result = cur.execute(query).fetchall()
-    # conn.close()
-    # print(result)
+    tree = create_tree()
+    app.run(debug=True)
 
 
-    # pprint.pprint(foo())
-
-    x = actor_profile('Timothée Chalamet')
-    print(x)
-
-    # url = "https://www.imdb.com/title/tt0111161/"
-    # response = requests.get(url)
-    # soup = BeautifulSoup(response.text, "html.parser")
-
-    # make_request_with_cache(url, soup.prettify())
-    
-    # section = soup.find("li", {"class":"ipc-metadata-list__item sc-3c7ce701-2 eYXppQ"})
-    # # indiv = section.find("ul")
-    # print(section.text.strip())
 
 
-    # x = actor_profile("timothee chalamet")
-    # print(x)
 
