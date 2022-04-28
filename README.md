@@ -1,6 +1,6 @@
 # MOVIE SEARCH ENGINE
 
-#INTRODUCTION
+# INTRODUCTION
 This file is uploaded as a part of the final project requirement for SI 507, Intermediate Programming at University of Michigan, Ann Arbor. The Movie Database API and OMDB API was used to gather information for the movies and TV shows to create a database and visualizations. 
 
 # Required Packages:
