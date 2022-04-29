@@ -9,16 +9,13 @@ import sqlite3
 import re
 from flask import Flask,render_template,request
 import pandas as pd
-import requests
-from bs4 import BeautifulSoup
 
 CACHE_FILENAME = "movie_cache.json"
 CACHE_DICT = {}
 DB_NAME = "movie.sqlite"
 
-
-
-tree = {}
+f = open('tree.json')
+tree = json.load(f)
 api_key = "9c601f958ba38d1f21e27b94cf35dd38"
 data = pd.read_csv("/Users/arjunanandapadmanabhan/Desktop/Projects/507_Final_Project/Data/tv.csv")
 
@@ -41,9 +38,6 @@ main_dict = {}
 def first_opt():
     if request.method == 'GET':
         return render_template('First_option.html')    
-        # if request.method == 'POST':
-        # temp = request.form.get("xxx")
-        # print(temp)
         
 
 @app.route('/language', methods = ['POST', 'GET'])
@@ -475,30 +469,6 @@ def acccess_genre_name(genre_id, option=None):
 
     return result
 
-first_op = ['TV', 'Movie']
-genre_op = ['Comedy', 'Drama', 'Romance', 'Crime', 'Animation', 'Family', 'Mystery', 'Fantasy', 'Thriller', 'Action', 'Adventure', 'History', 'War', 'Western', 'Science Fiction', 'Horror', 'TV Movie'\
-    'Music', 'Reality', 'Sci-Fi & Fantasy', 'Action & Adventure', 'Documentary', 'War & Politics', 'Kids', 'Soap', 'Talk', 'News', 'Musical']
-language_op = ['fr', 'es', 'hi', 'ja', 'ko', 'en']
-year_op = [str(x) for x in range(1990, 2023)]
-
-
-
-def create_tree():
-    
-    for f in first_op:
-        tree[f] = {}
-        for l in language_op:
-            tree[f][l] = {}
-            for g in genre_op:
-                g_val = access_genre_sql_database(g,f)
-                tree[f][l][g] = {}
-                for y in year_op:
-                    temp = db_to_dict(f, l, g_val, y)
-                    temp = [item for t in temp for item in t]
-                    tree[f][l][g][y] = temp
-    return tree
-
-
 def open_cache():
     ''' Opens the cache file if it exists and loads the JSON into
     the CACHE_DICT dictionary.
@@ -597,7 +567,6 @@ if __name__ == "__main__":
     CACHE_DICT = open_cache()
     create_database()
     populate_database()
-    tree = create_tree()
     app.run(debug=True)
 
 
