@@ -30,4 +30,10 @@ def create_tree():
     return tree
 data = create_tree()
 with open('tree.json', 'w') as f:
-    json.dump(data, f)
+    json.dump(data, f, indent=4, sort_keys=True)
+
+
+
+# with open("tree.json", "r") as read_file:
+#     tree = json.load(read_file)
+#     PrettyJson = json.dumps(tree, indent=4, separators=(',', ': '), sort_keys=True)
